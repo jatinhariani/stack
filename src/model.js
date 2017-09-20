@@ -10,4 +10,4 @@ const connection = knex({
 const model = bookshelf(connection)
 model.plugin(bookshelfModelbase.pluggable)
 
-module.exports = model
+module.exports = model.Model

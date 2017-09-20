@@ -1,5 +1,5 @@
 exports.up = function (knex, Promise) {
-  knex.schema.createTableIfNotExists('things', function (table) {
+  return knex.schema.createTableIfNotExists('things', function (table) {
     table.increments()
     table.string('name')
     table.dateTime('createdAt').notNullable()
