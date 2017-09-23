@@ -8,6 +8,10 @@ const connection = knex({
 })
 
 const model = bookshelf(connection)
+model.plugin('virtuals')
+model.plugin('visibility')
+model.plugin('pagination')
+model.plugin('registry')
 model.plugin(bookshelfModelbase.pluggable)
 
 module.exports = model.Model
