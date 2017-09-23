@@ -1,7 +1,7 @@
 import model from '../../model'
 import checkit from 'checkit'
 
-var Thing = model.extend({
+const Thing = model.extend({
   tableName: 'things',
   hasTimestamps: ['createdAt', 'updatedAt'],
   initialize: function () {
