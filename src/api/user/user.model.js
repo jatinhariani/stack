@@ -9,6 +9,7 @@ const User = model.extend({
   tableName: 'users',
   hasTimestamps: ['createdAt', 'updatedAt'],
   initialize: function () {
+    // validates twice on creation to detect password.
     this.on('creating', this.hashPassword, this)
     this.on('saving', this.validateSave)
   },
@@ -19,9 +20,12 @@ const User = model.extend({
     return new Promise((resolve, reject) => {
       // todo: check password length
       if ((typeof model.attributes.password === 'undefined' ||
-        model.attributes.password.length === 0) &&
-        ['google', 'facebook'].includes(model.attributes.provider)) {
-        model.attributes.password = uuidV4()
+        model.attributes.password.length === 0)) {
+        if (['google', 'facebook'].includes(model.attributes.provider)) {
+          model.attributes.password = uuidV4()
+        } else {
+          return resolve('')
+        }
       }
       bcrypt.hash(model.attributes.password, 10, (err, hash) => {
         if (err) {
@@ -36,15 +40,38 @@ const User = model.extend({
     email: ['email', 'required'],
     givenName: ['string', 'maxLength:100'],
     familyName: ['string', 'maxLength:100'],
-    provider: (val) => {
+    role: (val) => {
       return validationUtils.validateAmong(
         val,
-        ['google', 'facebook'],
+        ['admin', 'editor', 'user'],
         'Invalid role'
       )
     },
-    password: ['required'],
+    provider: (val) => {
+      return validationUtils.validateAmong(
+        val,
+        ['google', 'facebook', 'email'],
+        'Invalid role'
+      )
+    },
     profileImage: ['url']
+  },
+  emailRegistrationRules: {
+    email: ['required', 'email', function (val) {
+      return User.findOne({
+        email: val
+      }).then(function (user) {
+        if (user) {
+          throw new Error('The email address is already registered.')
+        }
+        return true
+      })
+        .catch(User.NotFoundError, () => {
+          console.log('not found')
+          return true
+        })
+    }],
+    password: ['required', 'minLength:6', 'maxLength:20']
   }
 })
 
