@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 
 import model from '../../model'
 import validationUtils from '../../utils/validation'
+import userMailer from './user.mailer'
 
 const User = model.extend({
   tableName: 'users',
@@ -12,6 +13,7 @@ const User = model.extend({
     // validates twice on creation to detect password.
     this.on('creating', this.hashPassword, this)
     this.on('saving', this.validateSave)
+    this.on('created', userMailer.sendWelcomeEmail, this)
   },
   validateSave: function () {
     return checkit(this.rules).run(this.attributes)
