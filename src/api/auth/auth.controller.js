@@ -1,6 +1,9 @@
 import checkit from 'checkit'
+import bcrypt from 'bcrypt'
+import config from 'config'
 
 import User from '../user/user.model'
+import AuthService from './auth.service'
 
 exports.email = (req, res) => {
   const emailValidator = checkit(User.prototype.emailRegistrationRules)
@@ -28,5 +31,32 @@ exports.email = (req, res) => {
 }
 
 exports.login = (req, res) => {
-
+  return User.findOne({
+    email: req.body.email
+  })
+    .then((user) => {
+      bcrypt.compare(req.body.password, user.get('password')).then((result) => {
+        if (!result) {
+          res.status(401).send({
+            err: 'Invalid email/password combination'
+          })
+        } else {
+          const token = AuthService.signToken(user)
+          res.json({
+            userId: user.get('id'),
+            token: token,
+            ttl: config.get('auth.ttl')
+          })
+        }
+      })
+    })
+    .catch(User.NotFoundError, (err) => {
+      res.status(404).json(err)
+    })
+    .catch(() => {
+      // todo: stadardize errors
+      res.status(401).send({
+        err: 'User not found'
+      })
+    })
 }
