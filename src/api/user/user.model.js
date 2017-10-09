@@ -9,11 +9,12 @@ import userMailer from './user.mailer'
 const User = model.extend({
   tableName: 'users',
   hasTimestamps: ['createdAt', 'updatedAt'],
+  hidden: ['password', 'verificationCode'],
   initialize: function () {
     // validates twice on creation to detect password.
     this.on('creating', this.hashPassword, this)
     this.on('saving', this.validateSave)
-    this.on('created', userMailer.sendWelcomeEmail, this)
+    this.on('created', this.sendEmailOnSignUp, this)
   },
   validateSave: function () {
     return checkit(this.rules).run(this.attributes)
@@ -62,18 +63,25 @@ const User = model.extend({
     email: ['required', 'email', function (val) {
       return User.findOne({
         email: val
-      }).then(function (user) {
-        if (user) {
-          throw new Error('The email address is already registered.')
-        }
-        return true
       })
+        .then(function (user) {
+          if (user) {
+            throw new Error('The email address is already registered.')
+          }
+          return true
+        })
         .catch(User.NotFoundError, () => {
-          console.log('not found')
           return true
         })
     }],
     password: ['required', 'minLength:6', 'maxLength:20']
+  },
+  sendEmailOnSignUp: (model) => {
+    if (model.get('verificationCode')) {
+      userMailer.sendVerificationEmail(model)
+    } else {
+      userMailer.sendWelcomeEmail(model)
+    }
   }
 })
 

@@ -1,5 +1,6 @@
 module.exports = {
   app: {
+    publicUrl: process.env.PUBLIC_URL,
     port: process.env.PORT
   },
   auth: {

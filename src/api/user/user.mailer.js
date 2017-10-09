@@ -1,7 +1,10 @@
 import mailer from '../../utils/mailer'
+import config from 'config'
 
 exports.sendVerificationEmail = (user) => {
-  console.log('Send Verification Email')
+  mailer.sendMail(user.get('email'),
+    'Verify your email',
+    '<p>Hey ' + user.get('givenName') + ',</p><p>Click <a href=' + config.app.publicUrl + '/api/user/verify?code=' + user.get('verificationCode') + '>here</a> to verify your email.</p>')
 }
 
 exports.sendWelcomeEmail = (user) => {
