@@ -2,11 +2,11 @@ import checkit from 'checkit'
 import uuidV4 from 'uuid/v4'
 import bcrypt from 'bcrypt'
 
-import model from '../../model'
+import bookshelf from '../../model'
 import validationUtils from '../../utils/validation'
 import userMailer from './user.mailer'
 
-const User = model.extend({
+const User = bookshelf.Model.extend({
   tableName: 'users',
   hasTimestamps: ['createdAt', 'updatedAt'],
   hidden: ['password', 'verificationCode'],
@@ -85,4 +85,4 @@ const User = model.extend({
   }
 })
 
-module.exports = User
+module.exports = bookshelf.model('User', User)

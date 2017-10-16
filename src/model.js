@@ -14,4 +14,4 @@ model.plugin('pagination')
 model.plugin('registry')
 model.plugin(bookshelfModelbase.pluggable)
 
-module.exports = model.Model
+module.exports = model

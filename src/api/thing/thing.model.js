@@ -1,7 +1,7 @@
-import model from '../../model'
+import bookshelf from '../../model'
 import checkit from 'checkit'
 
-const Thing = model.extend({
+const Thing = bookshelf.Model.extend({
   tableName: 'things',
   hasTimestamps: ['createdAt', 'updatedAt'],
   initialize: function () {
@@ -15,4 +15,4 @@ const Thing = model.extend({
   }
 })
 
-module.exports = Thing
+module.exports = bookshelf.model('Thing', Thing)
